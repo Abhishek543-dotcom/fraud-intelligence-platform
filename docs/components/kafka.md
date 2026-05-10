@@ -33,7 +33,7 @@ graph TB
 ```
 
 !!! info "Why KRaft over Zookeeper"
-    KRaft saves ~512 MB of memory by eliminating the Zookeeper JVM. On a 16 GB laptop with 8 GB Docker allocation, every megabyte counts. See [ADR-001](../architecture/decisions.md#adr-001-kraft-over-zookeeper).
+    KRaft saves ~512 MB of memory by eliminating the Zookeeper JVM. On a 16 GB laptop with 8 GB Docker allocation, every megabyte counts. See [ADR-001](../architecture/decisions.md#adr-001-kraft-mode-over-zookeeper-for-kafka).
 
 ## Topic Inventory
 

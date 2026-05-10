@@ -230,7 +230,7 @@ flowchart LR
 | 10 | `amount_to_avg_ratio` | Stateful | Running average | `amount / running_avg_amount` per customer | Spending spike |
 
 !!! warning "State Management"
-    Stateful features require Spark checkpoint state. If checkpoints are cleared, running statistics (mean, stddev, last_location) reset and produce inaccurate values until enough data accumulates. See [Checkpointing](#checkpointing--exactly-once-semantics) below.
+    Stateful features require Spark checkpoint state. If checkpoints are cleared, running statistics (mean, stddev, last_location) reset and produce inaccurate values until enough data accumulates. See [Checkpointing](#checkpointing-exactly-once-semantics) below.
 
 ---
 

@@ -155,9 +155,9 @@ graph LR
 | [**Getting Started**](getting-started/prerequisites.md) | Prerequisites, installation, first-run walkthrough |
 | [**Architecture**](architecture/overview.md) | System design, data flow, ADRs, scaling strategy |
 | [**Components**](components/kafka.md) | Deep-dives into each technology component |
-| [**Development**](development/project-structure.md) | Project structure, coding standards, testing |
-| [**API Reference**](api/rest-endpoints.md) | REST endpoints, WebSocket protocol, schemas |
-| [**Runbooks**](runbooks/troubleshooting.md) | Operational troubleshooting and disaster recovery |
+| [**Development**](development/local-setup.md) | Project structure, coding standards, testing |
+| [**API Reference**](api-reference/rest-api.md) | REST endpoints, WebSocket protocol, schemas |
+| [**Runbooks**](runbook/troubleshooting.md) | Operational troubleshooting and disaster recovery |
 
 ---
 
@@ -199,7 +199,7 @@ open http://localhost:5173
 ```
 
 !!! info "Full setup instructions"
-    See the [Prerequisites](getting-started/prerequisites.md) and [Installation](getting-started/installation.md) guides for detailed setup steps.
+    See the [Prerequisites](getting-started/prerequisites.md) and [Quick Start](getting-started/quick-start.md) guides for detailed setup steps.
 
 ---
 
