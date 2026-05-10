@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: fraud-platform
+
+resources:
+  - namespace.yml
+  - kafka/deployment.yml
+  - kafka/service.yml
+  - kafka/pvc.yml
+  - spark/master-deployment.yml
+  - spark/worker-deployment.yml
+  - spark/services.yml
+  - minio/deployment.yml
+  - minio/service.yml
+  - minio/pvc.yml
+  - backend/deployment.yml
+  - backend/service.yml
+  - frontend/deployment.yml
+  - frontend/service.yml
+  - monitoring/prometheus-deployment.yml
+  - monitoring/grafana-deployment.yml
+  - ingress.yml
+
+commonLabels:
+  app.kubernetes.io/part-of: fraud-intelligence-platform

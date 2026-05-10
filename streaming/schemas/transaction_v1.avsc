@@ -1,0 +1,62 @@
+{
+  "type": "record",
+  "name": "Transaction",
+  "namespace": "com.fraud.intelligence.events",
+  "doc": "A financial transaction event flowing through the fraud detection pipeline.",
+  "fields": [
+    { "name": "transaction_id", "type": "string", "doc": "Unique UUID for this transaction" },
+    { "name": "customer_id", "type": "string", "doc": "Customer identifier" },
+    { "name": "merchant_id", "type": "string", "doc": "Merchant identifier" },
+    {
+      "name": "amount",
+      "type": { "type": "bytes", "logicalType": "decimal", "precision": 12, "scale": 2 },
+      "doc": "Transaction amount"
+    },
+    { "name": "currency", "type": "string", "default": "USD", "doc": "ISO 4217 currency code" },
+    {
+      "name": "transaction_type",
+      "type": { "type": "enum", "name": "TransactionType", "symbols": ["CARD_SWIPE", "ATM_WITHDRAWAL", "ONLINE_PURCHASE", "WIRE_TRANSFER", "P2P"] },
+      "doc": "Type of financial transaction"
+    },
+    {
+      "name": "timestamp",
+      "type": { "type": "long", "logicalType": "timestamp-millis" },
+      "doc": "Transaction timestamp in milliseconds since epoch"
+    },
+    { "name": "merchant_category", "type": "string", "doc": "Merchant Category Code (MCC)" },
+    { "name": "merchant_name", "type": "string" },
+    { "name": "merchant_country", "type": "string" },
+    { "name": "merchant_city", "type": "string" },
+    { "name": "customer_lat", "type": "double", "doc": "Customer latitude at transaction time" },
+    { "name": "customer_lon", "type": "double", "doc": "Customer longitude at transaction time" },
+    { "name": "device_id", "type": "string", "doc": "Device identifier" },
+    { "name": "device_fingerprint", "type": "string", "doc": "Browser/device fingerprint hash" },
+    { "name": "ip_address", "type": "string", "doc": "Client IP address" },
+    {
+      "name": "channel",
+      "type": { "type": "enum", "name": "Channel", "symbols": ["POS", "ATM", "WEB", "MOBILE", "BRANCH"] },
+      "doc": "Transaction channel"
+    },
+    { "name": "is_international", "type": "boolean", "default": false },
+    { "name": "card_present", "type": "boolean", "default": true },
+    {
+      "name": "authentication_method",
+      "type": { "type": "enum", "name": "AuthMethod", "symbols": ["CHIP", "SWIPE", "CONTACTLESS", "PIN", "PASSWORD", "BIOMETRIC", "TWO_FACTOR", "NONE"] },
+      "doc": "How the customer authenticated"
+    },
+    {
+      "name": "risk_indicators",
+      "type": { "type": "map", "values": "string" },
+      "default": {},
+      "doc": "Key-value risk signals"
+    },
+    {
+      "name": "metadata",
+      "type": { "type": "map", "values": "string" },
+      "default": {},
+      "doc": "Additional key-value metadata"
+    },
+    { "name": "is_fraud", "type": "boolean", "default": false, "doc": "Ground truth label for training" },
+    { "name": "fraud_type", "type": ["null", "string"], "default": null, "doc": "Type of fraud if is_fraud is true" }
+  ]
+}

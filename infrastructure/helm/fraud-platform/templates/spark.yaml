@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-master
+  namespace: {{ include "fraud-platform.namespace" . }}
+  labels:
+    app: spark-master
+    {{- include "fraud-platform.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.spark.master.replicas }}
+  selector:
+    matchLabels:
+      app: spark-master
+  template:
+    metadata:
+      labels:
+        app: spark-master
+    spec:
+      containers:
+        - name: spark-master
+          image: {{ .Values.spark.image }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          env:
+            - name: SPARK_MODE
+              value: master
+          resources:
+            {{- toYaml .Values.spark.master.resources | nindent 12 }}
+          ports:
+            - containerPort: 8080
+            - containerPort: 7077
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-worker
+  namespace: {{ include "fraud-platform.namespace" . }}
+  labels:
+    app: spark-worker
+spec:
+  replicas: {{ .Values.spark.worker.replicas }}
+  selector:
+    matchLabels:
+      app: spark-worker
+  template:
+    metadata:
+      labels:
+        app: spark-worker
+    spec:
+      containers:
+        - name: spark-worker
+          image: {{ .Values.spark.image }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          env:
+            - name: SPARK_MODE
+              value: worker
+            - name: SPARK_MASTER_URL
+              value: "spark://spark-master:7077"
+            - name: SPARK_WORKER_MEMORY
+              value: {{ .Values.spark.worker.memory | quote }}
+            - name: SPARK_WORKER_CORES
+              value: {{ .Values.spark.worker.cores | quote }}
+          resources:
+            {{- toYaml .Values.spark.worker.resources | nindent 12 }}
+          ports:
+            - containerPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-master
+  namespace: {{ include "fraud-platform.namespace" . }}
+spec:
+  selector:
+    app: spark-master
+  ports:
+    - name: webui
+      port: 8080
+    - name: master
+      port: 7077

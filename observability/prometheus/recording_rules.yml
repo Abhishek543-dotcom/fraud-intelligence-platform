@@ -1,0 +1,44 @@
+# =============================================================================
+# Prometheus Recording Rules — Pre-computed Metrics
+# =============================================================================
+groups:
+  - name: fraud_platform_recording
+    interval: 30s
+    rules:
+      # Transaction throughput per minute
+      - record: fraud:transactions_per_minute
+        expr: rate(fraud_transactions_total[1m]) * 60
+
+      # Fraud alert rate per minute
+      - record: fraud:alerts_per_minute
+        expr: rate(fraud_alerts_total[1m]) * 60
+
+      # Overall fraud ratio
+      - record: fraud:fraud_ratio
+        expr: rate(fraud_alerts_total[5m]) / (rate(fraud_transactions_total[5m]) + 0.001)
+
+      # Model inference P50, P95, P99
+      - record: fraud:model_latency_p50
+        expr: histogram_quantile(0.50, rate(fraud_model_inference_duration_seconds_bucket[5m]))
+
+      - record: fraud:model_latency_p95
+        expr: histogram_quantile(0.95, rate(fraud_model_inference_duration_seconds_bucket[5m]))
+
+      - record: fraud:model_latency_p99
+        expr: histogram_quantile(0.99, rate(fraud_model_inference_duration_seconds_bucket[5m]))
+
+      # API request rate by status
+      - record: api:requests_per_second
+        expr: rate(http_requests_total{job="backend"}[1m])
+
+      # API error rate
+      - record: api:error_rate
+        expr: rate(http_requests_total{job="backend", status=~"5.."}[5m]) / (rate(http_requests_total{job="backend"}[5m]) + 0.001)
+
+      # Kafka consumer lag by topic
+      - record: kafka:consumer_lag_by_topic
+        expr: sum(kafka_consumergroup_lag_sum) by (topic)
+
+      # Memory usage ratio by job
+      - record: infra:memory_usage_ratio
+        expr: process_resident_memory_bytes / (process_virtual_memory_max_bytes + 1)

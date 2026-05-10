@@ -1,0 +1,9 @@
+# Transaction Simulator & Kafka Producer
+aiokafka==0.10.0
+pydantic==2.6.1
+faker==23.2.1
+numpy==1.26.4
+python-dateutil==2.9.0
+structlog==24.1.0
+prometheus-client==0.20.0
+avro-python3==1.10.2

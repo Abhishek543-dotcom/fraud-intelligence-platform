@@ -1,0 +1,77 @@
+features:
+  numeric:
+    - tx_count_1h
+    - tx_count_24h
+    - amount
+    - amount_avg_7d
+    - amount_zscore
+    - geo_velocity_kmh
+    - merchant_risk_score
+    - time_since_last_tx
+    - rapid_tx_count
+    - amount_to_avg_ratio
+  categorical:
+    - is_international
+    - card_present
+    - is_unusual_hour
+    - device_consistency
+
+models:
+  isolation_forest:
+    n_estimators: 200
+    contamination: 0.02
+    random_state: 42
+    max_samples: auto
+    max_features: 1.0
+  xgboost:
+    n_estimators: 300
+    max_depth: 6
+    learning_rate: 0.1
+    scale_pos_weight: 50
+    eval_metric: aucpr
+    early_stopping_rounds: 20
+    tree_method: hist
+    random_state: 42
+  random_forest:
+    n_estimators: 200
+    class_weight: balanced
+    max_depth: 12
+    min_samples_split: 10
+    n_jobs: -1
+    random_state: 42
+  ensemble:
+    weights:
+      xgboost: 0.5
+      random_forest: 0.3
+      isolation_forest: 0.2
+    calibration_method: isotonic
+
+thresholds:
+  block: 0.85
+  review: 0.60
+  alert: 0.40
+
+training:
+  test_size: 0.15
+  val_size: 0.15
+  random_state: 42
+  use_smote: false
+  smote_ratio: 0.3
+  optuna_trials: 50
+  enable_optuna: false
+
+inference:
+  model_type: ensemble
+  batch_size: 256
+  timeout_ms: 50
+  fallback_threshold: 0.5
+
+feature_store:
+  redis_url: redis://redis:6379/1
+  ttl_seconds: 86400
+  prefix: "fraud:features:"
+
+paths:
+  models_dir: ml/models
+  reports_dir: ml/reports
+  data_dir: ml/data

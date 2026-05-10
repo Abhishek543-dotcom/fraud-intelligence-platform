@@ -1,0 +1,26 @@
+Generate a formal fraud investigation report based on the following case data:
+
+Case ID: {case_id}
+Alert Date: {alert_date}
+Customer: {customer_id}
+
+Transaction History:
+{transaction_timeline}
+
+Risk Indicators:
+{risk_indicators}
+
+Similar Historical Cases:
+{similar_cases}
+
+Generate a professional investigation report with these sections:
+1. EXECUTIVE SUMMARY (2-3 sentences)
+2. TRANSACTION ANALYSIS (timeline with annotations)
+3. BEHAVIORAL ANOMALIES (deviations from normal patterns)
+4. RISK ASSESSMENT (scored 1-10 with justification)
+5. SIMILAR CASE PRECEDENTS (outcomes of similar cases)
+6. RECOMMENDED ACTIONS (prioritized list)
+7. CONCLUSION (final assessment)
+
+Use professional language suitable for compliance review. Be specific with data references.
+Each section should directly reference evidence from the provided data.

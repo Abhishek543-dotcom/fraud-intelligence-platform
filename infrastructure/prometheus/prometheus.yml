@@ -1,0 +1,77 @@
+# ============================================================
+# Prometheus Configuration
+# Scrape targets for the fraud intelligence platform
+# ============================================================
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+        labels:
+          service: "prometheus"
+
+  # FastAPI Backend — exposes /metrics via prometheus-client
+  - job_name: "backend"
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["backend:8888"]
+        labels:
+          service: "fraud-backend"
+
+  # ML Service — exposes /metrics
+  - job_name: "ml-service"
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["ml-service:8889"]
+        labels:
+          service: "fraud-ml-service"
+
+  # Spark Master Web UI metrics
+  - job_name: "spark-master"
+    metrics_path: "/metrics/json"
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["spark-master:8080"]
+        labels:
+          service: "spark-master"
+
+  # Spark Worker Web UI metrics
+  - job_name: "spark-worker"
+    metrics_path: "/metrics/json"
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["spark-worker:8081"]
+        labels:
+          service: "spark-worker"
+
+  # Kafka — JMX metrics (if JMX exporter sidecar is added)
+  - job_name: "kafka"
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["kafka:9404"]
+        labels:
+          service: "kafka"
+
+  # MinIO — built-in Prometheus metrics
+  - job_name: "minio"
+    metrics_path: "/minio/v2/metrics/cluster"
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["minio:9000"]
+        labels:
+          service: "minio"
+
+  # Redis — if redis-exporter is added
+  - job_name: "redis"
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["redis:6379"]
+        labels:
+          service: "redis"

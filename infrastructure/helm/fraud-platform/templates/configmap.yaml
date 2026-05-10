@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fraud-platform-config
+  namespace: {{ include "fraud-platform.namespace" . }}
+  labels:
+    {{- include "fraud-platform.labels" . | nindent 4 }}
+data:
+  KAFKA_BROKER: "kafka:9092"
+  MINIO_ENDPOINT: "http://minio:9000"
+  NESSIE_URI: "http://nessie:19120/api/v1"
+  ICEBERG_WAREHOUSE: "s3://lakehouse/"
+  REDIS_URL: "redis://redis:6379/0"
+  SPARK_MASTER_URL: "spark://spark-master:7077"
+  OLLAMA_HOST: "http://ollama:11434"
+  OLLAMA_MODEL: "mistral"
+  LOG_LEVEL: "info"

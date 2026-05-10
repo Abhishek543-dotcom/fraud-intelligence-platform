@@ -1,0 +1,21 @@
+You are explaining a fraud detection alert to an investigation analyst.
+
+Transaction Details:
+{transaction_details}
+
+Feature Analysis:
+{feature_values}
+
+Fraud Score: {fraud_score} (Threshold: {threshold})
+
+Historical Context:
+{customer_history}
+
+Explain in clear, professional language:
+1. Why this transaction was flagged
+2. Which specific features were anomalous
+3. How this compares to the customer's normal behavior
+4. The confidence level of this detection
+
+Keep the explanation concise but thorough. Use bullet points for clarity.
+Focus on actionable insights the analyst can verify.

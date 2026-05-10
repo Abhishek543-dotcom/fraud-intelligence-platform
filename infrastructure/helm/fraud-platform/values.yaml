@@ -1,0 +1,82 @@
+# Default values for fraud-platform Helm chart
+global:
+  namespace: fraud-platform
+  imagePullPolicy: IfNotPresent
+
+kafka:
+  image: bitnami/kafka:3.7
+  replicas: 1
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: 500m
+    requests:
+      memory: 256Mi
+      cpu: 250m
+  storage: 5Gi
+  heapOpts: "-Xmx384m -Xms256m"
+
+spark:
+  image: fraud-platform/spark:latest
+  master:
+    replicas: 1
+    resources:
+      limits:
+        memory: 256Mi
+        cpu: 500m
+  worker:
+    replicas: 1
+    memory: 896m
+    cores: 2
+    resources:
+      limits:
+        memory: 1024Mi
+        cpu: 1000m
+
+minio:
+  image: minio/minio:latest
+  replicas: 1
+  resources:
+    limits:
+      memory: 256Mi
+      cpu: 500m
+  storage: 10Gi
+  rootUser: admin
+  rootPassword: minio_secret_123
+
+backend:
+  image: fraud-platform/backend:latest
+  replicas: 2
+  resources:
+    limits:
+      memory: 256Mi
+      cpu: 500m
+  port: 8000
+
+frontend:
+  image: fraud-platform/frontend:latest
+  replicas: 1
+  resources:
+    limits:
+      memory: 128Mi
+      cpu: 250m
+  port: 80
+
+monitoring:
+  prometheus:
+    image: prom/prometheus:latest
+    resources:
+      limits:
+        memory: 128Mi
+        cpu: 250m
+  grafana:
+    image: grafana/grafana:latest
+    resources:
+      limits:
+        memory: 128Mi
+        cpu: 250m
+    adminPassword: admin
+
+ingress:
+  enabled: true
+  host: fraud.local

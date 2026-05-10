@@ -1,0 +1,60 @@
+{
+  "expectation_suite_name": "fraud_alerts_suite",
+  "ge_cloud_id": null,
+  "expectations": [
+    {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": { "column": "alert_id" },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_unique",
+      "kwargs": { "column": "alert_id" },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "transaction_id" },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "fraud_type" },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": { "column": "confidence_score", "min_value": 0.0, "max_value": 1.0 },
+      "meta": { "notes": "Confidence scores must be valid probabilities" }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": { "column": "risk_score", "min_value": 0.0, "max_value": 1.0 },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "severity",
+        "value_set": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "status",
+        "value_set": ["OPEN", "INVESTIGATING", "CONFIRMED", "FALSE_POSITIVE", "RESOLVED"]
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": { "column": "model_version" },
+      "meta": {}
+    }
+  ],
+  "meta": {
+    "great_expectations_version": "0.18.12"
+  }
+}

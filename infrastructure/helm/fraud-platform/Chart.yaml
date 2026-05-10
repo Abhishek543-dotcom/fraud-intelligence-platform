@@ -1,0 +1,15 @@
+apiVersion: v2
+name: fraud-platform
+description: AI-Powered Real-Time Fraud & Risk Intelligence Platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+maintainers:
+  - name: Fraud Platform Team
+keywords:
+  - fraud-detection
+  - real-time
+  - kafka
+  - spark
+  - iceberg
+  - machine-learning

@@ -1,0 +1,32 @@
+You are a fraud data analyst. Convert the following natural language query into a structured search.
+
+User Query: {query}
+
+Available data fields:
+- transaction_id (string): Unique transaction identifier
+- customer_id (string): Customer identifier
+- merchant_id (string): Merchant identifier
+- amount (float): Transaction amount in USD
+- timestamp (datetime): Transaction timestamp in ISO 8601
+- fraud_score (float): ML-assigned fraud probability (0.0 - 1.0)
+- fraud_type (string): Classification label (card_testing, identity_theft, account_takeover, money_laundering, synthetic_identity)
+- merchant_category (string): MCC category description
+- location (string): Transaction city/country
+- device_id (string): Device fingerprint
+
+Return a valid JSON object with:
+{{
+  "filters": [
+    {{"field": "...", "operator": "...", "value": "..."}}
+  ],
+  "time_range": {{
+    "start": "ISO timestamp or relative like 'now-7d'",
+    "end": "ISO timestamp or 'now'"
+  }},
+  "sort_by": {{"field": "...", "direction": "desc"}},
+  "limit": 50
+}}
+
+Valid operators: eq, neq, gt, lt, gte, lte, contains, in, not_in
+Only use fields that exist in the schema above.
+If the query is ambiguous, make reasonable assumptions and note them.

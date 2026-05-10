@@ -1,0 +1,44 @@
+# Local development overrides (16GB MacBook, 8GB Docker)
+global:
+  namespace: fraud-platform
+  imagePullPolicy: Never
+
+kafka:
+  replicas: 1
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: 500m
+
+spark:
+  worker:
+    replicas: 1
+    memory: 896m
+    cores: 2
+    resources:
+      limits:
+        memory: 1024Mi
+        cpu: 1000m
+
+minio:
+  storage: 5Gi
+
+backend:
+  replicas: 1
+  resources:
+    limits:
+      memory: 256Mi
+      cpu: 500m
+
+frontend:
+  replicas: 1
+
+monitoring:
+  prometheus:
+    resources:
+      limits:
+        memory: 128Mi
+  grafana:
+    resources:
+      limits:
+        memory: 128Mi
