@@ -1,0 +1,117 @@
+site_name: Fraud Intelligence Platform
+site_url: https://abhishek543-dotcom.github.io/fraud-intelligence-platform/
+site_description: >-
+  AI-Powered Real-Time Fraud & Risk Intelligence Platform — Production-grade
+  distributed systems architecture running locally on Docker Desktop.
+site_author: Abhishek Tiwari
+repo_url: https://github.com/Abhishek543-dotcom/fraud-intelligence-platform
+repo_name: fraud-intelligence-platform
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+
+plugins:
+  - search
+  - mermaid2
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Abhishek543-dotcom/fraud-intelligence-platform
+  generator: false
+
+copyright: Copyright &copy; 2024-2026 Abhishek Tiwari
+
+nav:
+  - Home: index.md
+  - Architecture:
+      - System Overview: architecture/overview.md
+      - Data Flow: architecture/data-flow.md
+      - Architecture Decisions: architecture/decisions.md
+      - Scaling Strategy: architecture/scaling.md
+  - Getting Started:
+      - Prerequisites: getting-started/prerequisites.md
+      - Quick Start: getting-started/quick-start.md
+      - Configuration: getting-started/configuration.md
+  - Components:
+      - Kafka Streaming: components/kafka.md
+      - Spark Processing: components/spark.md
+      - Iceberg Lakehouse: components/iceberg.md
+      - ML Pipeline: components/ml-pipeline.md
+      - AI Copilot: components/ai-copilot.md
+      - Backend API: components/backend-api.md
+      - Frontend Dashboard: components/frontend.md
+      - Observability: components/observability.md
+  - Runbook:
+      - Operations Guide: runbook/operations.md
+      - Troubleshooting: runbook/troubleshooting.md
+      - Disaster Recovery: runbook/disaster-recovery.md
+      - Performance Tuning: runbook/performance-tuning.md
+      - Deployment Guide: runbook/deployment.md
+  - Development:
+      - Local Setup: development/local-setup.md
+      - Testing Strategy: development/testing.md
+      - CI/CD Pipeline: development/ci-cd.md
+      - Contributing: development/contributing.md
+  - API Reference:
+      - REST API: api-reference/rest-api.md
+      - WebSocket Protocol: api-reference/websocket.md
+  - Interview Guide:
+      - System Design: interview-guide/system-design.md
+      - Deep Dives: interview-guide/deep-dives.md

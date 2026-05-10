@@ -196,4 +196,23 @@ reset: ## Full platform reset (interactive confirmation)
 
 .PHONY: prune
 prune: ## Remove unused Docker resources
-	docker system prune -f --volumes
+  docker system prune -f --volumes
+
+# =============================================================================
+# Documentation
+# =============================================================================
+
+.PHONY: docs-serve
+docs-serve: ## Serve documentation locally (http://localhost:8000)
+  @pip install mkdocs-material mkdocs-mermaid2-plugin pymdown-extensions --quiet 2>/dev/null
+  mkdocs serve -a localhost:8000
+
+.PHONY: docs-build
+docs-build: ## Build documentation static site
+  @pip install mkdocs-material mkdocs-mermaid2-plugin pymdown-extensions --quiet 2>/dev/null
+  mkdocs build --strict
+
+.PHONY: docs-deploy
+docs-deploy: ## Deploy documentation to GitHub Pages (manual)
+  @pip install mkdocs-material mkdocs-mermaid2-plugin pymdown-extensions --quiet 2>/dev/null
+  mkdocs gh-deploy --force
