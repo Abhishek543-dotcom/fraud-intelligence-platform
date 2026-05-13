@@ -7,6 +7,10 @@ import type { FraudAlert, ConnectionState } from '../types';
 interface FraudAlertFeedProps {
   alerts: FraudAlert[];
   connectionState: ConnectionState;
+  isPaused?: boolean;
+  onPause?: () => void;
+  onResume?: () => void;
+  fullPage?: boolean;
 }
 
 export default function FraudAlertFeed({ alerts, connectionState }: FraudAlertFeedProps) {

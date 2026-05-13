@@ -35,6 +35,8 @@ export interface FraudAlert {
   features: Record<string, number>;
   timestamp: string;
   created_at: string;
+  category?: string;
+  description?: string;
 }
 
 export interface Customer {

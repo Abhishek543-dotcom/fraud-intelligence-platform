@@ -27,6 +27,8 @@ export function formatDate(dateStr: string): string {
   return format(parseISO(dateStr), 'MMM d, yyyy HH:mm:ss');
 }
 
+export const formatTimestamp = formatDate;
+
 export function formatRelativeTime(dateStr: string): string {
   return formatDistanceToNow(parseISO(dateStr), { addSuffix: true });
 }

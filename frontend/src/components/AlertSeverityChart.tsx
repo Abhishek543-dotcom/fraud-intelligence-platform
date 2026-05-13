@@ -4,7 +4,7 @@ import {
 import type { FraudAlert } from '../types';
 
 interface AlertSeverityChartProps {
-  alerts: FraudAlert[];
+  alerts?: FraudAlert[];
 }
 
 const SEVERITY_COLORS: Record<string, string> = {
@@ -14,7 +14,7 @@ const SEVERITY_COLORS: Record<string, string> = {
   low: '#4ade80',
 };
 
-export default function AlertSeverityChart({ alerts }: AlertSeverityChartProps) {
+export default function AlertSeverityChart({ alerts = [] }: AlertSeverityChartProps) {
   const severityCounts = alerts.reduce<Record<string, number>>((acc, alert) => {
     acc[alert.severity] = (acc[alert.severity] || 0) + 1;
     return acc;

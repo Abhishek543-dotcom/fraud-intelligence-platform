@@ -1,8 +1,8 @@
 # ============================================================
 # Airflow — Dockerfile with Spark + Kafka providers
-# Base: apache/airflow:2.8-python3.11 (ARM64 compatible)
+# Base: apache/airflow:2.8.0-python3.11 (ARM64 compatible)
 # ============================================================
-FROM apache/airflow:2.8-python3.11
+FROM apache/airflow:2.8.0-python3.11
 
 USER root
 

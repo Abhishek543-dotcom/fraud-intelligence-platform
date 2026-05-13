@@ -385,8 +385,8 @@ services:
   frontend:
     <<: *common
     build:
-      context: ./infrastructure/docker/frontend
-      dockerfile: Dockerfile
+      context: ./frontend
+      dockerfile: ../infrastructure/docker/frontend/Dockerfile
       args:
         - VITE_API_URL=${VITE_API_URL}
         - VITE_WS_URL=${VITE_WS_URL}

@@ -1,10 +1,16 @@
 # ============================================================
 # Spark — Dockerfile with Iceberg, Hadoop-AWS, and Python deps
-# Base: bitnami/spark:3.5 (ARM64 compatible)
+# Base: apache/spark:3.5.0 (ARM64 compatible)
 # ============================================================
-FROM bitnami/spark:3.5
+FROM apache/spark:3.5.0
 
 USER root
+
+# Install curl and pip
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl python3-pip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Iceberg and AWS JARs for S3/MinIO connectivity
 ENV ICEBERG_VERSION=1.5.0
@@ -14,25 +20,24 @@ ENV HADOOP_AWS_VERSION=3.3.4
 ENV AWS_SDK_VERSION=1.12.262
 
 RUN curl -fSL "https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-${SPARK_VERSION}_${SCALA_VERSION}/${ICEBERG_VERSION}/iceberg-spark-runtime-${SPARK_VERSION}_${SCALA_VERSION}-${ICEBERG_VERSION}.jar" \
-      -o /opt/bitnami/spark/jars/iceberg-spark-runtime.jar && \
+      -o ${SPARK_HOME}/jars/iceberg-spark-runtime.jar && \
     curl -fSL "https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-aws-bundle/${ICEBERG_VERSION}/iceberg-aws-bundle-${ICEBERG_VERSION}.jar" \
-      -o /opt/bitnami/spark/jars/iceberg-aws-bundle.jar && \
+      -o ${SPARK_HOME}/jars/iceberg-aws-bundle.jar && \
     curl -fSL "https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/${HADOOP_AWS_VERSION}/hadoop-aws-${HADOOP_AWS_VERSION}.jar" \
-      -o /opt/bitnami/spark/jars/hadoop-aws.jar && \
+      -o ${SPARK_HOME}/jars/hadoop-aws.jar && \
     curl -fSL "https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/${AWS_SDK_VERSION}/aws-java-sdk-bundle-${AWS_SDK_VERSION}.jar" \
-      -o /opt/bitnami/spark/jars/aws-java-sdk-bundle.jar
+      -o ${SPARK_HOME}/jars/aws-java-sdk-bundle.jar
 
-# Install Python packages
+# Install Python packages (Python 3.8 in base image)
 RUN pip install --no-cache-dir \
-    pyspark==${SPARK_VERSION}.0 \
     kafka-python==2.0.2 \
-    pandas==2.1.4 \
+    pandas==2.0.3 \
     pyarrow==14.0.2 \
     boto3==1.34.0 \
     requests==2.31.0
 
 # Spark defaults for Iceberg + S3/MinIO
-RUN cat >> /opt/bitnami/spark/conf/spark-defaults.conf <<'EOF'
+RUN mkdir -p ${SPARK_HOME}/conf && cat >> ${SPARK_HOME}/conf/spark-defaults.conf <<'EOF'
 spark.sql.extensions                           org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions
 spark.sql.catalog.nessie                       org.apache.iceberg.spark.SparkCatalog
 spark.sql.catalog.nessie.catalog-impl          org.apache.iceberg.nessie.NessieCatalog
@@ -51,4 +56,8 @@ spark.sql.adaptive.enabled                     true
 spark.sql.adaptive.coalescePartitions.enabled   true
 EOF
 
-USER 1001
+# Custom entrypoint to support SPARK_MODE env var (bitnami compat)
+COPY entrypoint.sh /opt/entrypoint.sh
+RUN chmod +x /opt/entrypoint.sh
+
+ENTRYPOINT ["/opt/entrypoint.sh"]
