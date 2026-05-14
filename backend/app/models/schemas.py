@@ -136,3 +136,41 @@ class FilterParams(BaseModel):
     max_amount: Optional[float] = None
     severity: Optional[str] = None
     status: Optional[str] = None
+
+
+class TransactionListResponse(BaseModel):
+    data: List[TransactionResponse]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+
+
+class MetricOverview(BaseModel):
+    total_transactions_24h: int
+    fraud_detected_24h: int
+    amount_blocked_24h: float
+    false_positive_rate: float
+    avg_inference_time_ms: float
+
+
+class AlertStatsResponse(BaseModel):
+    total: int
+    open: int
+    investigating: int
+    resolved: int
+    false_positive: int
+    by_severity: Dict[str, int]
+    by_category: Dict[str, int]
+
+
+class ModelMetricsResponse(BaseModel):
+    model_name: str
+    model_version: str
+    accuracy: float
+    precision: float
+    recall: float
+    f1_score: float
+    auc_roc: float
+    total_predictions: int
+    timestamp: str

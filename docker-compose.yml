@@ -326,7 +326,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 1024M
 
   # ===========================================================================
   # FastAPI Backend
@@ -417,7 +417,7 @@ services:
       context: ./infrastructure/docker/simulator
       dockerfile: Dockerfile
     container_name: fraud-simulator
-    profiles: ["core"]
+    profiles: ["simulator"]
     depends_on:
       kafka:
         condition: service_healthy
