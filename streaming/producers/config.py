@@ -44,7 +44,7 @@ class KafkaConfig:
     topic_alerts: str = "fraud_alerts"
 
     # Producer tuning
-    compression_type: str = "snappy"
+    compression_type: str = os.getenv("KAFKA_COMPRESSION_TYPE", "gzip")
     batch_size: int = 16384
     linger_ms: int = 10
     max_retries: int = 5

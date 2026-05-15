@@ -15,6 +15,7 @@ COPY requirements.txt* ./
 RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; else \
     pip install --no-cache-dir \
         kafka-python==2.0.2 \
+        aiokafka==0.10.0 \
         faker==22.0.0 \
         numpy==1.26.3 \
         pandas==2.1.4 \
@@ -25,4 +26,4 @@ RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.
 
 COPY . .
 
-CMD ["python", "-m", "simulator.main"]
+CMD ["python", "-m", "streaming.producers.transaction_simulator"]

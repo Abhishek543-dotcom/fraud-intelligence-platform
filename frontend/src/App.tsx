@@ -8,6 +8,7 @@ import ModelPerformance from './components/ModelPerformance';
 import InvestigationChat from './components/InvestigationChat';
 import KafkaThroughput from './components/KafkaThroughput';
 import AlertSeverityChart from './components/AlertSeverityChart';
+import Observability from './components/Observability';
 import { useFraudAlerts } from './hooks/useFraudAlerts';
 import { useWebSocket } from './hooks/useWebSocket';
 import type { ConnectionState } from './types';
@@ -41,7 +42,7 @@ function Dashboard({
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <KafkaThroughput />
-        <AlertSeverityChart />
+        <AlertSeverityChart alerts={alerts} />
       </div>
     </div>
   );
@@ -86,6 +87,7 @@ export default function App() {
           }
         />
         <Route path="/transactions" element={<TransactionTable />} />
+        <Route path="/observability" element={<Observability />} />
         <Route path="/investigations" element={<InvestigationChat />} />
         <Route path="/models" element={<ModelPerformance />} />
       </Routes>

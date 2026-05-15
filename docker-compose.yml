@@ -142,6 +142,7 @@ services:
     image: minio/mc:latest
     container_name: fraud-minio-init
     profiles: ["core"]
+    restart: "no"
     depends_on:
       minio:
         condition: service_healthy
@@ -152,6 +153,7 @@ services:
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
     deploy:
       resources:
         limits:
@@ -197,6 +199,13 @@ services:
       - SPARK_MASTER_PORT=7077
       - SPARK_MASTER_WEBUI_PORT=8080
       - SPARK_DAEMON_MEMORY=192m
+      - PYTHONPATH=/opt/spark-app
+      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
+      - AWS_REGION=us-east-1
+    volumes:
+      - ./streaming:/opt/spark-app/streaming
+      - ./lakehouse:/opt/spark-app/lakehouse
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/json/ || exit 1"]
       interval: 15s
@@ -206,7 +215,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 512M
 
   # ===========================================================================
   # Apache Spark (Worker)
@@ -230,9 +239,13 @@ services:
       - SPARK_WORKER_CORES=${SPARK_WORKER_CORES}
       - SPARK_WORKER_WEBUI_PORT=8081
       - SPARK_DAEMON_MEMORY=128m
+      - PYTHONPATH=/opt/spark-app
       - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
       - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
       - AWS_REGION=us-east-1
+    volumes:
+      - ./streaming:/opt/spark-app/streaming
+      - ./lakehouse:/opt/spark-app/lakehouse
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8081/json/ || exit 1"]
       interval: 15s
@@ -242,7 +255,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1024M
+          memory: 2048M
 
   # ===========================================================================
   # Airflow Webserver
@@ -274,8 +287,10 @@ services:
       - _AIRFLOW_WWW_USER_USERNAME=${AIRFLOW_ADMIN_USER}
       - _AIRFLOW_WWW_USER_PASSWORD=${AIRFLOW_ADMIN_PASSWORD}
     volumes:
-      - airflow-dags:/opt/airflow/dags
+      - ./airflow/dags:/opt/airflow/dags
       - airflow-logs:/opt/airflow/logs
+      - ./streaming:/opt/airflow/streaming
+      - ./lakehouse:/opt/airflow/lakehouse
     command: >
       bash -c "
         airflow db migrate &&
@@ -314,8 +329,10 @@ services:
       - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
       - AIRFLOW__LOGGING__BASE_LOG_FOLDER=/opt/airflow/logs
     volumes:
-      - airflow-dags:/opt/airflow/dags
+      - ./airflow/dags:/opt/airflow/dags
       - airflow-logs:/opt/airflow/logs
+      - ./streaming:/opt/airflow/streaming
+      - ./lakehouse:/opt/airflow/lakehouse
     command: airflow scheduler
     healthcheck:
       test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob --hostname \"$$(hostname)\" || exit 1"]
@@ -417,7 +434,7 @@ services:
       context: ./infrastructure/docker/simulator
       dockerfile: Dockerfile
     container_name: fraud-simulator
-    profiles: ["simulator"]
+    profiles: ["core"]
     depends_on:
       kafka:
         condition: service_healthy
@@ -425,18 +442,21 @@ services:
       - KAFKA_BROKER=${KAFKA_BROKER}
       - REDIS_URL=${REDIS_URL}
       - LOG_LEVEL=${LOG_LEVEL}
+      - TARGET_TPS=${TARGET_TPS:-50}
+      - PYTHONPATH=/app
+    working_dir: /app
     volumes:
-      - ./simulator:/app
+      - ./streaming:/app/streaming
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import os; exit(0)' || exit 1"]
+      test: ["CMD-SHELL", "pgrep -f streaming.producers.transaction_simulator || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 15s
     deploy:
       resources:
         limits:
-          memory: 128M
+          memory: 256M
 
   # ===========================================================================
   # Ollama (LLM)
@@ -451,7 +471,7 @@ services:
     volumes:
       - ollama-models:/root/.ollama
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/11434' || exit 1"]
       interval: 15s
       timeout: 10s
       retries: 5
@@ -477,7 +497,7 @@ services:
       - IS_PERSISTENT=TRUE
       - ANONYMIZED_TELEMETRY=FALSE
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/heartbeat || exit 1"]
+      test: ["CMD-SHELL", "python3 -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/api/v2/heartbeat\").read()' || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -584,6 +604,60 @@ services:
       resources:
         limits:
           memory: 128M
+
+  # ===========================================================================
+  # Spark Streaming Driver (always-on fraud detection pipeline)
+  # ===========================================================================
+  spark-streaming-app:
+    <<: *common
+    build:
+      context: ./infrastructure/docker/spark
+      dockerfile: Dockerfile
+    container_name: fraud-spark-streaming-app
+    profiles: ["core"]
+    depends_on:
+      spark-master:
+        condition: service_healthy
+      spark-worker:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      nessie:
+        condition: service_healthy
+    environment:
+      - PYTHONPATH=/opt/spark-app
+      - KAFKA_BROKER=kafka:9092
+      - NESSIE_URI=http://nessie:19120/api/v1
+      - WAREHOUSE=s3a://lakehouse/warehouse
+      - ICEBERG_WAREHOUSE=s3a://lakehouse/warehouse
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
+      - AWS_REGION=us-east-1
+    volumes:
+      - ./streaming:/opt/spark-app/streaming
+      - ./lakehouse:/opt/spark-app/lakehouse
+    working_dir: /opt/spark-app
+    entrypoint: []
+    command: >
+      /opt/spark/bin/spark-submit
+      --master spark://spark-master:7077
+      --deploy-mode client
+      --name FraudDetectionStreaming
+      --conf spark.driver.host=spark-streaming-app
+      --conf spark.driver.bindAddress=0.0.0.0
+      --conf spark.executor.memory=512m
+      --conf spark.driver.memory=512m
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0
+      /opt/spark-app/streaming/spark_jobs/fraud_detection_streaming.py
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
 
 # =============================================================================
 # Networks

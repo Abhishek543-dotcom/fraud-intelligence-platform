@@ -8,44 +8,23 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
-import { fetchDashboardMetrics } from '../services/api';
-import { useRef, useEffect, useState } from 'react';
-
-interface ThroughputPoint {
-  time: string;
-  produced: number;
-  consumed: number;
-}
+import { fetchKafkaThroughputHistory } from '../services/api';
 
 export default function KafkaThroughput() {
-  const [dataPoints, setDataPoints] = useState<ThroughputPoint[]>([]);
-  const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const { data } = useQuery({
+    queryKey: ['kafka-throughput'],
+    queryFn: fetchKafkaThroughputHistory,
+    refetchInterval: 5_000,
+  });
 
-  // Simulate throughput data from metrics
-  useEffect(() => {
-    const generatePoint = (): ThroughputPoint => {
-      const now = new Date();
-      return {
-        time: `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`,
-        produced: Math.floor(Math.random() * 500 + 200),
-        consumed: Math.floor(Math.random() * 480 + 180),
-      };
+  const series = (data ?? []).map((p) => {
+    const d = new Date(p.timestamp);
+    return {
+      time: `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`,
+      produced: p.topics?.transactions_raw ?? 0,
+      enriched: p.topics?.transactions_enriched ?? 0,
     };
-
-    // Seed initial data
-    setDataPoints(Array.from({ length: 30 }, generatePoint));
-
-    intervalRef.current = setInterval(() => {
-      setDataPoints((prev) => {
-        const next = [...prev, generatePoint()];
-        return next.length > 60 ? next.slice(-60) : next;
-      });
-    }, 5000);
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
+  });
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
@@ -54,7 +33,7 @@ export default function KafkaThroughput() {
         <span className="text-xs text-gray-500">msgs/sec</span>
       </div>
       <ResponsiveContainer width="100%" height={250}>
-        <AreaChart data={dataPoints}>
+        <AreaChart data={series}>
           <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
           <XAxis dataKey="time" stroke="#6b7280" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
           <YAxis stroke="#6b7280" tick={{ fontSize: 11 }} />
@@ -73,16 +52,16 @@ export default function KafkaThroughput() {
             fill="#3b82f6"
             fillOpacity={0.15}
             strokeWidth={2}
-            name="Produced"
+            name="transactions_raw"
           />
           <Area
             type="monotone"
-            dataKey="consumed"
+            dataKey="enriched"
             stroke="#22c55e"
             fill="#22c55e"
             fillOpacity={0.1}
             strokeWidth={2}
-            name="Consumed"
+            name="transactions_enriched"
           />
         </AreaChart>
       </ResponsiveContainer>

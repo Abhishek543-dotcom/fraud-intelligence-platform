@@ -80,6 +80,103 @@ export async function fetchDashboardMetrics(): Promise<DashboardMetrics> {
   return data.data;
 }
 
+export interface KafkaTopicInfo {
+  topic: string;
+  partitions: number;
+  messages: number;
+}
+export interface ThroughputPoint {
+  timestamp: string;
+  total_per_sec: number;
+  topics: Record<string, number>;
+}
+export interface SparkAppInfo {
+  id: string;
+  name: string;
+  state: string;
+  cores: number;
+  duration: number;
+}
+export interface SparkState {
+  status: string;
+  workers: number;
+  alive_workers: number;
+  cores_total: number;
+  cores_used: number;
+  memory_mb: number;
+  active_apps: number;
+  completed_apps: number;
+  apps: SparkAppInfo[];
+}
+export interface MinioBucket {
+  name: string;
+  objects: number;
+  size_bytes: number;
+}
+export interface MinioState {
+  reachable: boolean;
+  buckets: MinioBucket[];
+}
+export interface NessieState {
+  reachable: boolean;
+  tables: { name: string; type: string }[];
+  namespaces: string[];
+}
+export interface MlState {
+  reachable: boolean;
+  predictions_total: number;
+  fraud_ratio: number;
+  latency_p50_ms: number;
+  latency_p95_ms: number;
+}
+export interface ServiceStatus {
+  status: string;
+  [key: string]: unknown;
+}
+export interface SystemState {
+  services: Record<string, ServiceStatus>;
+  timestamp: string;
+}
+
+export async function fetchKafkaTopics(): Promise<KafkaTopicInfo[]> {
+  const { data } = await client.get<APIResponse<{ topics: KafkaTopicInfo[] }>>(
+    '/metrics/kafka/topics',
+  );
+  return data.data.topics;
+}
+
+export async function fetchKafkaThroughputHistory(): Promise<ThroughputPoint[]> {
+  const { data } = await client.get<APIResponse<{ points: ThroughputPoint[] }>>(
+    '/metrics/kafka/throughput-history',
+  );
+  return data.data.points;
+}
+
+export async function fetchSparkState(): Promise<SparkState> {
+  const { data } = await client.get<APIResponse<SparkState>>('/metrics/spark/master');
+  return data.data;
+}
+
+export async function fetchMinioState(): Promise<MinioState> {
+  const { data } = await client.get<APIResponse<MinioState>>('/metrics/minio/buckets');
+  return data.data;
+}
+
+export async function fetchNessieState(): Promise<NessieState> {
+  const { data } = await client.get<APIResponse<NessieState>>('/metrics/nessie/tables');
+  return data.data;
+}
+
+export async function fetchMlState(): Promise<MlState> {
+  const { data } = await client.get<APIResponse<MlState>>('/metrics/ml/health');
+  return data.data;
+}
+
+export async function fetchSystemState(): Promise<SystemState> {
+  const { data } = await client.get<APIResponse<SystemState>>('/metrics/system');
+  return data.data;
+}
+
 export async function sendInvestigationMessage(
   message: string,
   context?: Record<string, string>,

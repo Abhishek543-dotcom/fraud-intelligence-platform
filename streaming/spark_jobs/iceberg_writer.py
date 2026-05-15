@@ -10,6 +10,7 @@ from typing import Optional
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
+from pyspark.sql.window import Window
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,28 @@ def write_to_bronze(batch_df: DataFrame, batch_id: int) -> None:
         .withColumn("ingestion_timestamp", F.current_timestamp())
         .withColumn("event_date", F.to_date("event_timestamp"))
         .withColumn("batch_id", F.lit(batch_id))
+        .select(
+            "transaction_id",
+            "customer_id",
+            "amount",
+            "currency",
+            "merchant_id",
+            "merchant_name",
+            "merchant_category",
+            "transaction_type",
+            "channel",
+            "device_id",
+            "ip_address",
+            "latitude",
+            "longitude",
+            "city",
+            "country",
+            "is_fraud",
+            "event_timestamp",
+            "event_date",
+            "ingestion_timestamp",
+            "batch_id",
+        )
     )
 
     df_bronze.writeTo(BRONZE_TABLE).option(
@@ -82,7 +105,7 @@ def write_to_silver(batch_df: DataFrame, batch_id: int) -> None:
         .withColumn(
             "_rank",
             F.row_number().over(
-                F.Window.partitionBy("transaction_id").orderBy(F.col("event_timestamp").desc())
+                Window.partitionBy("transaction_id").orderBy(F.col("event_timestamp").desc())
             ),
         )
         .filter(F.col("_rank") == 1)

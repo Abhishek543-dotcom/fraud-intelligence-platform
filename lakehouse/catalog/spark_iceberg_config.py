@@ -43,6 +43,13 @@ def get_spark_session(
         .config("spark.sql.catalog.nessie.uri", nessie_uri)
         .config("spark.sql.catalog.nessie.ref", "main")
         .config("spark.sql.catalog.nessie.warehouse", warehouse)
+        # Tell Iceberg's S3FileIO (AWS SDK v2) to talk to MinIO instead of real S3
+        .config("spark.sql.catalog.nessie.io-impl", "org.apache.iceberg.aws.s3.S3FileIO")
+        .config("spark.sql.catalog.nessie.s3.endpoint", minio_endpoint)
+        .config("spark.sql.catalog.nessie.s3.access-key-id", minio_access_key)
+        .config("spark.sql.catalog.nessie.s3.secret-access-key", minio_secret_key)
+        .config("spark.sql.catalog.nessie.s3.path-style-access", "true")
+        .config("spark.sql.catalog.nessie.s3.region", "us-east-1")
         # S3/MinIO
         .config("spark.hadoop.fs.s3a.endpoint", minio_endpoint)
         .config("spark.hadoop.fs.s3a.access.key", minio_access_key)

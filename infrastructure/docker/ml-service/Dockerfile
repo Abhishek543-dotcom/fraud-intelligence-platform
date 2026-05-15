@@ -38,6 +38,6 @@ RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.
 
 COPY . .
 
-EXPOSE 8889
+EXPOSE 8000
 
-CMD ["uvicorn", "ml_service.main:app", "--host", "0.0.0.0", "--port", "8889", "--workers", "1"]
+CMD ["uvicorn", "inference.model_server:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]

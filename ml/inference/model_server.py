@@ -27,8 +27,14 @@ from starlette.responses import Response
 logger = structlog.get_logger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-CONFIG_PATH = PROJECT_ROOT / "ml" / "config.yml"
-MODELS_DIR = PROJECT_ROOT / "ml" / "models"
+ML_ROOT = Path(__file__).resolve().parents[1]
+# Support both layouts: project root with ml/ subdir, and ml/ mounted as cwd
+CONFIG_PATH = ML_ROOT / "config.yml"
+if not CONFIG_PATH.exists():
+    CONFIG_PATH = PROJECT_ROOT / "ml" / "config.yml"
+MODELS_DIR = ML_ROOT / "models"
+if not MODELS_DIR.exists():
+    MODELS_DIR = PROJECT_ROOT / "ml" / "models"
 
 # ---------------------------------------------------------------------------
 # Prometheus metrics
