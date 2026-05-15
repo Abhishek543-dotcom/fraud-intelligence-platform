@@ -23,6 +23,10 @@ MERCHANTS = [
     "Amazon", "Walmart", "Target", "Starbucks", "Shell Gas",
     "Best Buy", "Netflix", "Uber", "DoorDash", "Apple Store",
 ]
+CHANNELS = ["online", "pos", "atm", "mobile"]
+COUNTRIES = ["US", "US", "US", "CA", "GB", "DE", "FR", "AU"]
+FIRST_NAMES = ["James", "Maria", "Robert", "Sarah", "Michael", "Emily", "David", "Lisa"]
+LAST_NAMES = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis"]
 
 
 def _generate_alert(i: int) -> FraudAlertResponse:
@@ -43,6 +47,7 @@ def _generate_alert(i: int) -> FraudAlertResponse:
         alert_id=f"ALT-{uuid.uuid4().hex[:12].upper()}",
         transaction_id=f"TXN-{uuid.uuid4().hex[:12].upper()}",
         customer_id=f"CUST-{random.randint(10000, 99999)}",
+        customer_name=f"{random.choice(FIRST_NAMES)} {random.choice(LAST_NAMES)}",
         merchant_name=random.choice(MERCHANTS),
         amount=round(random.uniform(50, 9999.99), 2),
         currency="USD",
@@ -51,8 +56,11 @@ def _generate_alert(i: int) -> FraudAlertResponse:
         category=category,
         description=f"Suspicious {category.lower()} detected with confidence {score:.0%}",
         timestamp=ts.isoformat(),
+        created_at=ts.isoformat(),
         location_lat=round(random.uniform(25.0, 48.0), 6),
         location_lon=round(random.uniform(-124.0, -71.0), 6),
+        country=random.choice(COUNTRIES),
+        channel=random.choice(CHANNELS),
         status=random.choice(ALERT_STATUSES),
         features={
             "amount_zscore": round(random.uniform(-1, 5), 2),

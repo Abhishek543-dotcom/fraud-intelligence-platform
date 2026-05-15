@@ -22,7 +22,7 @@ class Settings(BaseSettings):
 
     # Ollama
     ollama_host: str = "http://ollama:11434"
-    ollama_model: str = "mistral"
+    ollama_model: str = "qwen2:0.5b"
 
     # ChromaDB
     chromadb_host: str = "chromadb"

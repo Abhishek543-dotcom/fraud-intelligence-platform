@@ -37,6 +37,8 @@ class FraudAlertResponse(BaseModel):
     location_lon: float
     country: str
     channel: str
+    category: Optional[str] = None
+    description: Optional[str] = None
     features: Dict[str, float] = {}
     timestamp: str
     created_at: str
@@ -90,18 +92,15 @@ class DashboardMetrics(BaseModel):
 
 
 class InvestigationRequest(BaseModel):
-    alert_id: str
+    message: str
+    alert_id: Optional[str] = None
+    context: Optional[Dict[str, str]] = None
     notes: Optional[str] = None
 
 
 class InvestigationResponse(BaseModel):
-    investigation_id: str
-    alert_id: str
-    status: str
-    assignee: Optional[str] = None
-    notes: Optional[str] = None
-    created_at: str
-    updated_at: str
+    data: str
+    message: Optional[str] = None
 
 
 class WebSocketMessage(BaseModel):

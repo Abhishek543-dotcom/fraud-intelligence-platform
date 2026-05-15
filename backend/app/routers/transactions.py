@@ -20,6 +20,13 @@ MERCHANTS = [
     "Best Buy", "Netflix", "Uber", "DoorDash", "Apple Store",
     "Home Depot", "Costco", "Whole Foods", "CVS Pharmacy", "McDonald's",
 ]
+MERCHANT_CATEGORIES = [
+    "Retail", "Food & Beverage", "Gas & Fuel", "Electronics",
+    "Entertainment", "Travel", "Healthcare", "Grocery",
+]
+COUNTRIES = ["US", "US", "US", "CA", "GB", "DE", "FR", "AU"]
+FIRST_NAMES = ["James", "Maria", "Robert", "Sarah", "Michael", "Emily", "David", "Lisa"]
+LAST_NAMES = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis"]
 STATUSES = ["approved", "declined", "flagged", "pending"]
 
 
@@ -33,6 +40,9 @@ def _generate_transaction(i: int) -> TransactionResponse:
         customer_id=f"CUST-{random.randint(10000, 99999)}",
         merchant_id=f"MERCH-{random.randint(1000, 9999)}",
         merchant_name=random.choice(MERCHANTS),
+        merchant_category=random.choice(MERCHANT_CATEGORIES),
+        customer_name=f"{random.choice(FIRST_NAMES)} {random.choice(LAST_NAMES)}",
+        country=random.choice(COUNTRIES),
         amount=amount,
         currency="USD",
         timestamp=ts.isoformat(),
