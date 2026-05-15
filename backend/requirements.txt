@@ -18,3 +18,5 @@ python-multipart==0.0.6
 prometheus-fastapi-instrumentator==6.1.0
 structlog==24.1.0
 orjson==3.9.12
+pyiceberg[s3]==0.7.1
+duckdb==0.10.0

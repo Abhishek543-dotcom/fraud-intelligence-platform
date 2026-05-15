@@ -189,4 +189,48 @@ export async function sendInvestigationMessage(
   return response.body;
 }
 
+// ---------------------------------------------------------------------------
+// SQL Editor
+// ---------------------------------------------------------------------------
+
+export interface IcebergTableInfo {
+  namespace: string;
+  name: string;
+  full_name: string;
+  type: string;
+}
+
+export interface IcebergTableSchema {
+  namespace: string;
+  name: string;
+  columns: { name: string; type: string }[];
+}
+
+export interface SqlQueryResult {
+  columns: string[];
+  rows: unknown[][];
+  row_count: number;
+  execution_time_ms: number;
+}
+
+export async function fetchIcebergTables(): Promise<IcebergTableInfo[]> {
+  const { data } = await client.get<IcebergTableInfo[]>('/sql/tables');
+  return data;
+}
+
+export async function fetchTableSchema(
+  namespace: string,
+  table: string,
+): Promise<IcebergTableSchema> {
+  const { data } = await client.get<IcebergTableSchema>(
+    `/sql/tables/${namespace}/${table}/schema`,
+  );
+  return data;
+}
+
+export async function executeSQL(sql: string, limit = 1000): Promise<SqlQueryResult> {
+  const { data } = await client.post<SqlQueryResult>('/sql/execute', { sql, limit });
+  return data;
+}
+
 export default client;

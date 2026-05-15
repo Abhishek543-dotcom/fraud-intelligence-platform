@@ -9,6 +9,7 @@ import InvestigationChat from './components/InvestigationChat';
 import KafkaThroughput from './components/KafkaThroughput';
 import AlertSeverityChart from './components/AlertSeverityChart';
 import Observability from './components/Observability';
+import SqlEditor from './components/SqlEditor';
 import { useFraudAlerts } from './hooks/useFraudAlerts';
 import { useWebSocket } from './hooks/useWebSocket';
 import type { ConnectionState } from './types';
@@ -90,6 +91,7 @@ export default function App() {
         <Route path="/observability" element={<Observability />} />
         <Route path="/investigations" element={<InvestigationChat />} />
         <Route path="/models" element={<ModelPerformance />} />
+        <Route path="/sql" element={<SqlEditor />} />
       </Routes>
     </Layout>
   );

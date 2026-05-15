@@ -7,6 +7,7 @@ import {
   Brain,
   Shield,
   Activity,
+  Database,
 } from 'lucide-react';
 import clsx from 'clsx';
 import type { ConnectionState } from '../types';
@@ -18,6 +19,7 @@ const navItems = [
   { to: '/observability', label: 'Observability', icon: Activity },
   { to: '/investigations', label: 'Investigations', icon: MessageSquare },
   { to: '/models', label: 'Models', icon: Brain },
+  { to: '/sql', label: 'SQL Editor', icon: Database },
 ];
 
 interface LayoutProps {

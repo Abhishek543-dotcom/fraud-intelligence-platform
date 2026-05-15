@@ -36,7 +36,9 @@ RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.
         python-multipart==0.0.6 \
         python-jose[cryptography]==3.3.0 \
         passlib[bcrypt]==1.7.4 \
-        structlog==24.1.0; \
+        structlog==24.1.0 \
+        pyiceberg[s3]==0.7.1 \
+        duckdb==0.10.0; \
     fi
 
 # Copy application code
