@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
-import { Wifi, WifiOff, Pause, Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Wifi, WifiOff, Pause, Play, ExternalLink } from 'lucide-react';
 import clsx from 'clsx';
-import { formatCurrency, formatTimestamp, severityColor } from '../utils/formatters';
+import { formatCurrency, formatTimestamp, severityColor, severityBg } from '../utils/formatters';
 import type { FraudAlert, ConnectionState } from '../types';
 
 interface FraudAlertFeedProps {
@@ -13,15 +14,29 @@ interface FraudAlertFeedProps {
   fullPage?: boolean;
 }
 
-export default function FraudAlertFeed({ alerts, connectionState }: FraudAlertFeedProps) {
-  const [paused, setPaused] = useState(false);
+export default function FraudAlertFeed({
+  alerts,
+  connectionState,
+  isPaused = false,
+  onPause,
+  onResume,
+  fullPage = false,
+}: FraudAlertFeedProps) {
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!paused && listRef.current) {
+    if (!isPaused && listRef.current) {
       listRef.current.scrollTop = 0;
     }
-  }, [alerts, paused]);
+  }, [alerts, isPaused]);
+
+  const handleTogglePause = () => {
+    if (isPaused) {
+      onResume?.();
+    } else {
+      onPause?.();
+    }
+  };
 
   const statusIcon = connectionState === 'connected' ? (
     <Wifi className="w-3 h-3 text-green-400" />
@@ -30,7 +45,7 @@ export default function FraudAlertFeed({ alerts, connectionState }: FraudAlertFe
   );
 
   return (
-    <div className="card flex flex-col h-[420px]">
+    <div className={clsx('card flex flex-col', fullPage ? 'h-[calc(100vh-6rem)]' : 'h-[420px]')}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="card-header mb-0">Live Fraud Alerts</span>
@@ -38,19 +53,17 @@ export default function FraudAlertFeed({ alerts, connectionState }: FraudAlertFe
           <span className="text-xs text-gray-500">({alerts.length})</span>
         </div>
         <button
-          onClick={() => setPaused(!paused)}
+          onClick={handleTogglePause}
           className="p-1 hover:bg-gray-800 rounded transition-colors"
-          title={paused ? 'Resume auto-scroll' : 'Pause auto-scroll'}
+          title={isPaused ? 'Resume auto-scroll' : 'Pause auto-scroll'}
         >
-          {paused ? <Play className="w-3 h-3 text-gray-400" /> : <Pause className="w-3 h-3 text-gray-400" />}
+          {isPaused ? <Play className="w-3 h-3 text-gray-400" /> : <Pause className="w-3 h-3 text-gray-400" />}
         </button>
       </div>
 
       <div
         ref={listRef}
         className="flex-1 overflow-y-auto space-y-2"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
       >
         {alerts.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-500 text-sm">
@@ -72,14 +85,13 @@ function AlertCard({ alert }: { alert: FraudAlert }) {
   return (
     <div
       className={clsx(
-        'border rounded-lg p-3 cursor-pointer transition-colors hover:bg-gray-800/50',
-        severityColor(alert.severity)
+        'border rounded-lg p-3 transition-colors',
+        severityBg(alert.severity),
       )}
-      onClick={() => setExpanded(!expanded)}
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between cursor-pointer" onClick={() => setExpanded(!expanded)}>
         <div className="flex items-center gap-2">
-          <span className={clsx('badge', severityColor(alert.severity))}>
+          <span className={clsx('text-xs font-bold px-1.5 py-0.5 rounded', severityColor(alert.severity))}>
             {alert.severity.toUpperCase()}
           </span>
           <span className="text-xs text-gray-400 font-mono">{alert.transaction_id.slice(0, 12)}</span>
@@ -87,7 +99,7 @@ function AlertCard({ alert }: { alert: FraudAlert }) {
         <span className="text-xs text-gray-500">{formatTimestamp(alert.timestamp)}</span>
       </div>
       <div className="flex items-center justify-between mt-2">
-        <span className="text-sm font-medium">{formatCurrency(alert.amount)}</span>
+        <span className="text-sm font-medium text-white">{formatCurrency(alert.amount)}</span>
         <span className="text-sm text-gray-400">{alert.merchant_name}</span>
         <span className="text-xs font-mono text-gray-300">
           Score: {(alert.fraud_score * 100).toFixed(0)}%
@@ -110,6 +122,13 @@ function AlertCard({ alert }: { alert: FraudAlert }) {
           {alert.description && (
             <p className="text-gray-400 mt-1">{alert.description}</p>
           )}
+          <Link
+            to={`/alerts/${alert.alert_id}`}
+            className="flex items-center gap-1 mt-2 text-blue-400 hover:text-blue-300 transition-colors"
+          >
+            <ExternalLink className="w-3 h-3" />
+            View Details
+          </Link>
         </div>
       )}
     </div>

@@ -7,9 +7,12 @@ import {
   Brain,
   Shield,
   Activity,
+  Database,
+  GitBranch,
 } from 'lucide-react';
 import clsx from 'clsx';
-import type { ConnectionState } from '../types';
+import type { ConnectionState, FraudAlert } from '../types';
+import NotificationBell from './NotificationBell';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -18,15 +21,18 @@ const navItems = [
   { to: '/observability', label: 'Observability', icon: Activity },
   { to: '/investigations', label: 'Investigations', icon: MessageSquare },
   { to: '/models', label: 'Models', icon: Brain },
+  { to: '/sql', label: 'SQL Editor', icon: Database },
+  { to: '/lineage', label: 'Lineage', icon: GitBranch },
 ];
 
 interface LayoutProps {
   children: React.ReactNode;
   connectionState: ConnectionState;
   alertCount: number;
+  alerts?: FraudAlert[];
 }
 
-export default function Layout({ children, connectionState, alertCount }: LayoutProps) {
+export default function Layout({ children, connectionState, alertCount, alerts = [] }: LayoutProps) {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -34,10 +40,11 @@ export default function Layout({ children, connectionState, alertCount }: Layout
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center gap-2 min-w-0">
             <Shield className="w-8 h-8 text-blue-400 flex-shrink-0" />
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h1 className="text-sm font-bold text-white truncate">Fraud Intelligence</h1>
               <p className="text-xs text-gray-500 truncate">Real-Time Platform</p>
             </div>
+            <NotificationBell alerts={alerts} />
           </div>
         </div>
 

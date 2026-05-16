@@ -65,6 +65,40 @@ export async function updateAlertStatus(
   return data.data;
 }
 
+// ---------------------------------------------------------------------------
+// Alert Case Management
+// ---------------------------------------------------------------------------
+
+export interface AlertCaseNote {
+  text: string;
+  timestamp: string;
+  author?: string;
+}
+
+export interface AlertStatusHistoryEntry {
+  status: string;
+  timestamp: string;
+}
+
+export interface AlertCase {
+  assigned_to: string | null;
+  notes: AlertCaseNote[];
+  status_history: AlertStatusHistoryEntry[];
+}
+
+export async function fetchAlertCase(id: string): Promise<AlertCase> {
+  const { data } = await client.get<AlertCase>(`/alerts/${id}/case`);
+  return data;
+}
+
+export async function assignAlert(id: string, assignedTo: string): Promise<void> {
+  await client.put(`/alerts/${id}/assign`, { assigned_to: assignedTo });
+}
+
+export async function addAlertNote(id: string, text: string): Promise<void> {
+  await client.post(`/alerts/${id}/notes`, { text });
+}
+
 export async function fetchAlertStats(): Promise<Record<string, number>> {
   const { data } = await client.get('/alerts/stats');
   return data.data;
@@ -187,6 +221,98 @@ export async function sendInvestigationMessage(
     body: JSON.stringify({ message, context }),
   });
   return response.body;
+}
+
+// ---------------------------------------------------------------------------
+// SQL Editor
+// ---------------------------------------------------------------------------
+
+export interface IcebergTableInfo {
+  namespace: string;
+  name: string;
+  full_name: string;
+  type: string;
+}
+
+export interface IcebergTableSchema {
+  namespace: string;
+  name: string;
+  columns: { name: string; type: string }[];
+}
+
+export interface SqlQueryResult {
+  columns: string[];
+  rows: unknown[][];
+  row_count: number;
+  execution_time_ms: number;
+}
+
+export async function fetchIcebergTables(): Promise<IcebergTableInfo[]> {
+  const { data } = await client.get<IcebergTableInfo[]>('/sql/tables');
+  return data;
+}
+
+export async function fetchTableSchema(
+  namespace: string,
+  table: string,
+): Promise<IcebergTableSchema> {
+  const { data } = await client.get<IcebergTableSchema>(
+    `/sql/tables/${namespace}/${table}/schema`,
+  );
+  return data;
+}
+
+export async function executeSQL(sql: string, limit = 1000): Promise<SqlQueryResult> {
+  const { data } = await client.post<SqlQueryResult>('/sql/execute', { sql, limit });
+  return data;
+}
+
+// ---------------------------------------------------------------------------
+// Data Lineage
+// ---------------------------------------------------------------------------
+
+export interface LineageNode {
+  id: string;
+  type: string;
+  label: string;
+  metadata: { description: string; row_count?: number };
+}
+export interface LineageEdge {
+  source: string;
+  target: string;
+  label: string;
+}
+export interface LineageGraph {
+  nodes: LineageNode[];
+  edges: LineageEdge[];
+}
+
+export async function fetchLineage(): Promise<LineageGraph> {
+  const { data } = await client.get<LineageGraph>('/lineage');
+  return data;
+}
+
+// ---------------------------------------------------------------------------
+// Model Versions (A/B comparison)
+// ---------------------------------------------------------------------------
+
+export interface ModelVersion {
+  model_type: string;
+  version: string;
+  status: 'staged' | 'active' | 'archived';
+  metrics: {
+    precision: number;
+    recall: number;
+    f1_score: number;
+    auc_roc: number;
+    avg_latency_ms: number;
+  };
+  timestamp: string;
+}
+
+export async function fetchModelVersions(): Promise<ModelVersion[]> {
+  const { data } = await client.get<APIResponse<ModelVersion[]>>('/ml/models');
+  return data.data;
 }
 
 export default client;

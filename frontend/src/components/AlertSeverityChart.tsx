@@ -26,12 +26,12 @@ export default function AlertSeverityChart({ alerts = [] }: AlertSeverityChartPr
     color: SEVERITY_COLORS[name] ?? '#9ca3af',
   }));
 
-  // If no alerts yet, show placeholder data
+  // Use real data; show sample distribution when no alerts loaded yet (avoids blank chart)
   const displayData = pieData.length > 0 ? pieData : [
-    { name: 'Critical', value: 12, color: '#f87171' },
-    { name: 'High', value: 28, color: '#fb923c' },
-    { name: 'Medium', value: 45, color: '#facc15' },
-    { name: 'Low', value: 15, color: '#4ade80' },
+    { name: 'Critical', value: 23, color: '#f87171' },
+    { name: 'High', value: 87, color: '#fb923c' },
+    { name: 'Medium', value: 156, color: '#facc15' },
+    { name: 'Low', value: 76, color: '#4ade80' },
   ];
 
   // Category breakdown

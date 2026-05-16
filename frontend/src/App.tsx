@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import MetricsPanel from './components/MetricsPanel';
@@ -9,10 +10,13 @@ import InvestigationChat from './components/InvestigationChat';
 import KafkaThroughput from './components/KafkaThroughput';
 import AlertSeverityChart from './components/AlertSeverityChart';
 import Observability from './components/Observability';
+import SqlEditor from './components/SqlEditor';
+import DataLineage from './components/DataLineage';
+import AlertDetail from './components/AlertDetail';
 import { useFraudAlerts } from './hooks/useFraudAlerts';
 import { useWebSocket } from './hooks/useWebSocket';
-import type { ConnectionState } from './types';
-import { useState } from 'react';
+import { fetchAlerts } from './services/api';
+import type { ConnectionState, FraudAlert } from './types';
 
 function Dashboard({
   connectionState,
@@ -52,6 +56,18 @@ export default function App() {
   const fraudAlerts = useFraudAlerts();
   const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
 
+  // Seed alerts from REST API on initial load
+  useEffect(() => {
+    fetchAlerts({ page: 1, page_size: 20 })
+      .then((res) => {
+        const restAlerts = (res.data || []) as FraudAlert[];
+        restAlerts.forEach((alert) => {
+          fraudAlerts.handleMessage({ type: 'alert', data: alert });
+        });
+      })
+      .catch(() => {/* ignore — WebSocket will deliver alerts later */});
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   useWebSocket({
     onMessage: fraudAlerts.handleMessage,
     onConnect: () => setConnectionState('connected'),
@@ -59,7 +75,7 @@ export default function App() {
   });
 
   return (
-    <Layout connectionState={connectionState} alertCount={fraudAlerts.alerts.length}>
+    <Layout connectionState={connectionState} alertCount={fraudAlerts.alerts.length} alerts={fraudAlerts.alerts}>
       <Routes>
         <Route
           path="/"
@@ -90,6 +106,9 @@ export default function App() {
         <Route path="/observability" element={<Observability />} />
         <Route path="/investigations" element={<InvestigationChat />} />
         <Route path="/models" element={<ModelPerformance />} />
+        <Route path="/sql" element={<SqlEditor />} />
+        <Route path="/lineage" element={<DataLineage />} />
+        <Route path="/alerts/:id" element={<AlertDetail />} />
       </Routes>
     </Layout>
   );
