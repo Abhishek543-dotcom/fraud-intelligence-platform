@@ -12,7 +12,7 @@ from prometheus_client import make_asgi_app, Counter, Histogram
 
 from app.config import get_settings
 from app.dependencies import close_redis
-from app.routers import transactions, fraud_alerts, ml_predictions, investigation, metrics, websocket, sql_editor
+from app.routers import transactions, fraud_alerts, ml_predictions, investigation, metrics, websocket, sql_editor, lineage
 from app.services.kafka_consumer import KafkaAlertConsumer
 
 logger = structlog.get_logger()
@@ -109,6 +109,7 @@ app.include_router(investigation.router, prefix="/api", tags=["investigation"])
 app.include_router(metrics.router, prefix="/api", tags=["metrics"])
 app.include_router(websocket.router, tags=["websocket"])
 app.include_router(sql_editor.router, prefix="/api", tags=["sql-editor"])
+app.include_router(lineage.router, prefix="/api", tags=["lineage"])
 
 
 @app.get("/health")
